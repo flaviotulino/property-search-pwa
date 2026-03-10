@@ -5,4 +5,3 @@ services:
     build: .
     volumes:
       - .:/app # mount host folder into container
-    command: npm run build
