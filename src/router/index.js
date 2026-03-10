@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, RouterView } from "vue-router";
+import { createRouter, createWebHistory, RouterView } from "vue-router";
 import PropertyListPage from "../pages/PropertyListPage.vue";
 import axios from "axios";
 import usePropertyStore from "../store/properties";
@@ -8,18 +8,27 @@ const routes = [
     {
         path: '/',
         component: RouterView,
-        beforeEnter(to, from, next) {
-            const propertyStore = usePropertyStore();
+        beforeEnter: [
+            // (to, from, next) => {
+            //     if (window.location.pathname === '/parse') {
+            //         window.location.href = '/#/parse';
+            //     } else {
+            //         next();
+            //     }
+            // },
+            (to, from, next) => {
+                const propertyStore = usePropertyStore();
 
-            if (propertyStore.data) {
-                return true;
+                if (propertyStore.data) {
+                    return true;
+                }
+
+                axios.get('https://property-search.flaviotulino.com/api/properties').then(response => {
+                    propertyStore.setProperties(response.data.properties);
+                    return next()
+                })
             }
-
-            axios.get('https://property-search.flaviotulino.com/api/properties').then(response => {
-                propertyStore.setProperties(response.data.properties);
-                return next()
-            })
-        },
+        ],
         children: [
             {
                 path: '',
@@ -44,7 +53,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 })
 

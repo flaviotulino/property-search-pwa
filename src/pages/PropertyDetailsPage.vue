@@ -77,6 +77,7 @@ onMounted(() => {
     //     data: {
     //       url: route.query.url,
     // })
+    alert(window.location.href);
   } else {
     item = properties.value.find((p) => p.id === route.params.id);
   }
