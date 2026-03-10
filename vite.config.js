@@ -19,8 +19,9 @@ export default defineConfig({
       },
 
       manifest: {
-        name: 'property-search-pwa',
-        short_name: 'property-search-pwa',
+        name: 'Property Search',
+        "display_override": ["window-controls-overlay", "standalone"],
+        short_name: 'Property Search',
         description: 'property-search-pwa',
         theme_color: '#ffffff',
         share_target: {
