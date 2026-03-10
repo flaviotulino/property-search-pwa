@@ -69,15 +69,27 @@ const { data: properties } = storeToRefs(propertyStore);
 
 const property = ref();
 
-onMounted(() => {
+onMounted(async () => {
   let item;
 
   if (route.meta.isParsing) {
-    // axios.post("https://property-search.flaviotulino.com/api/properties/parse",
-    //     data: {
-    //       url: route.query.url,
-    // })
-    alert(window.location.href);
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    const text = route.query.text;
+    const match = text.match(urlRegex);
+    if (match) {
+      const url = match[0]; // Output: https://property-search.flaviotulino.com/parse?id=123
+      const response = await axios.post(
+        "https://property-search.flaviotulino.com/api/properties/parse",
+        {
+          data: {
+            url,
+          },
+        },
+      );
+
+      item = response.data;
+    }
   } else {
     item = properties.value.find((p) => p.id === route.params.id);
   }
