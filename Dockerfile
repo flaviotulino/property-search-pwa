@@ -9,4 +9,4 @@ RUN npm install
 # copy source source
 COPY . .
 
-RUN npm run build
+CMD [ "npm", "run", "build" ]
