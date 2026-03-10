@@ -1,11 +1,12 @@
 services:
   pwa:
-    #env_file:
-    #  - .env
-
     container_name: property-search-pwa
     build:
       dockerfile: Dockerfile
 
     volumes:
-      - .:/app # mount host folder to get dist/ on host
+      - .:/app
+      - node_modules:/app/node_modules
+
+volumes:
+  node_modules:
