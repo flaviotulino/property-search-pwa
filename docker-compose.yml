@@ -1,7 +1,11 @@
-version: "3.9"
-
 services:
-  app:
-    build: .
+  pwa:
+    #env_file:
+    #  - .env
+
+    container_name: property-search-pwa
+    build:
+      dockerfile: Dockerfile
+
     volumes:
-      - .:/app # mount host folder into container
+      - .:/app # mount host folder to get dist/ on host
