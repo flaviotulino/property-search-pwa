@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --material-tabbar-highlight-text-color: var(
+    --tabbar-highlight-text-color
+  ) !important;
+}
+/* @theme inline {
+  --toolbar-height: theme("spacing.12");
+}
+
+.toolbar {
+  height: var(--toolbar-height);
+}
+
+main {
+  padding-top: calc(var(--toolbar-height) + theme("spacing.4"));
+  padding-left: theme("spacing.4");
+  padding-right: theme("spacing.4");
+  padding-bottom: theme("spacing.4");
+  height: calc(100% - var(--toolbar-height));
+}
+
+main.has-secondary-toolbar {
+  height: calc(100% - (var(--toolbar-height) * 2));
+  padding-top: calc((var(--toolbar-height) * 2) + theme("spacing.4"));
+} */
