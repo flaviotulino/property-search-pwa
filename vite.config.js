@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     vue(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate', // Immediate takeover
       injectRegister: false,
 
       pwaAssets: {
@@ -25,7 +25,7 @@ export default defineConfig({
         theme_color: '#ffffff',
         share_target: {
           "action": "/parse",
-          "method": "POST",
+          "method": "GET",
           "enctype": "application/x-www-form-urlencoded",
           "params": {
             "title": "title",
