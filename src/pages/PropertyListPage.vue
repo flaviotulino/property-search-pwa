@@ -57,9 +57,14 @@ function seePropertyDetails(property) {
 
 onMounted(() => {
   if (router.currentRoute.value.query.locality) {
-    activeIndex.value = localities.value.findIndex(
+    const index = localities.value.findIndex(
       (l) => l === router.currentRoute.value.query.locality,
     );
+    activeIndex.value = index > -1 ? index : 0;
+    router.replace({
+      name: "property.list",
+      query: null,
+    });
   } else {
     activeIndex.value = 0;
   }

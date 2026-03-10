@@ -13,41 +13,110 @@
 
     <template v-if="property">
       <div
-        class="bg-no-repeat bg-cover w-full h-48"
+        class="bg-no-repeat bg-cover w-full h-60"
         :style="{ backgroundImage: `url(${property.photos[0]})` }"
       />
 
-      <div class="">
-        <div
-          class="space-y-1 flex flex-col px-4 border-b border-gray-200 border-2 pb-2"
-        >
-          <div class="mt-2 font-bold text-xl">{{ property.address }}</div>
-          <div class="text-gray-500">{{ property.price }}</div>
+      <div class="p-4 flex flex-col space-y-4">
+        <div class="space-y-1 flex flex-col bg-white rounded-md">
+          <div
+            class="border-b border-gray-200 flex flex-row items-center px-4 py-2 space-x-2"
+          >
+            <div
+              class="bg-black flex flex-row items-center justify-center w-8 h-8 rounded-full"
+            >
+              <i class="fa-solid fa-info text-white"></i>
+            </div>
+            <span class="text-lg font-bold">Details</span>
+          </div>
+          <div class="px-4 py-2">
+            <div class="font-bold text-lg">{{ property.address }}</div>
+            <div class="text-gray-500">{{ property.price }}</div>
+
+            <div class="flex flex-row items-center space-x-4 mt-2 -mx-1">
+              <div class="flex flex-row items-center space-x-1">
+                <i class="fa-solid fa-droplet text-blue-500"></i>
+                <span>{{ property.bathrooms }}</span>
+              </div>
+
+              <div class="flex flex-row items-center space-x-1">
+                <i class="fa-solid fa-bed"></i>
+                <span>{{ property.bedrooms }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <section>
+        <div class="flex flex-col space-y-4">
           <PropertyDistanceSection
             @on-distance-click="openDirection"
             label="Transport"
             :section="property.stations"
-          />
-        </section>
+          >
+            <template #icon>
+              <div
+                class="bg-green-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
+              >
+                <i class="fa-solid fa-bus text-white"></i>
+              </div>
+            </template>
+          </PropertyDistanceSection>
 
-        <section>
           <PropertyDistanceSection
             @on-distance-click="openDirection"
             label="Groceries"
             :section="property.groceries"
-          />
-        </section>
+          >
+            <template #icon>
+              <div
+                class="bg-purple-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
+              >
+                <i class="fa-solid fa-cart-shopping text-white"></i>
+              </div>
+            </template>
+          </PropertyDistanceSection>
 
-        <section>
           <PropertyDistanceSection
             @on-distance-click="openDirection"
             label="Schools"
             :section="property.schools"
-          />
-        </section>
+          >
+            <template #icon>
+              <div
+                class="bg-orange-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
+              >
+                <i class="fa-solid fa-school text-white"></i>
+              </div>
+            </template>
+          </PropertyDistanceSection>
+        </div>
+
+        <div
+          v-if="$route.meta.isParsing && !property.exists"
+          class="flex flex-row items-center space-x-2"
+        >
+          <button
+            @click="onBackButtonClick"
+            class="bg-gray-600 text-white p-4 rounded-md shadow text-lg uppercase font-bold"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="addProperty"
+            class="bg-green-800 border p-4 rounded-md shadow text-lg grow font-bold text-white uppercase"
+          >
+            Add to list
+          </button>
+        </div>
+
+        <button
+          v-else
+          @click="deleteProperty"
+          class="bg-red-700 text-white w-full p-4 rounded-md shadow text-lg uppercase font-bold"
+        >
+          Remove from list
+        </button>
       </div>
     </template>
   </v-ons-page>
@@ -57,7 +126,7 @@
 import { useRoute, useRouter } from "vue-router";
 import usePropertyStore from "../store/properties";
 import { storeToRefs } from "pinia";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import PropertyDistanceSection from "../components/PropertyDistanceSection.vue";
 import axios from "axios";
 
@@ -82,9 +151,7 @@ onMounted(async () => {
       const response = await axios.post(
         "https://property-search.flaviotulino.com/api/properties/parse",
         {
-          data: {
-            url,
-          },
+          url,
         },
       );
 
@@ -126,6 +193,39 @@ function onBackButtonClick() {
       locality: property.value.locality,
     },
   });
+}
+
+function deleteProperty() {
+  axios
+    .delete(
+      `https://property-search.flaviotulino.com/api/properties/${property.value.id}`,
+    )
+    .then(() => {
+      propertyStore.deleteProperty(property.value.id);
+      router.push({
+        name: "property.list",
+        query: {
+          locality: property.value.locality,
+        },
+      });
+    });
+}
+
+function addProperty() {
+  axios
+    .post(
+      "https://property-search.flaviotulino.com/api/properties",
+      property.value,
+    )
+    .then(() => {
+      propertyStore.addProperty(property.value);
+      router.push({
+        name: "property.list",
+        query: {
+          locality: property.value.locality,
+        },
+      });
+    });
 }
 </script>
 

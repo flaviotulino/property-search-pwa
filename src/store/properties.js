@@ -8,9 +8,19 @@ const usePropertyStore = defineStore('properties', () => {
         data.value = properties;
     }
 
+    function deleteProperty(id) {
+        data.value = data.value.filter(p => p.id !== id);
+    }
+
+    function addProperty(property) {
+        data.value.push(property);
+    }
+
     return {
         data,
-        setProperties
+        setProperties,
+        deleteProperty,
+        addProperty
     }
 })
 
