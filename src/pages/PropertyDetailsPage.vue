@@ -27,7 +27,7 @@
             >
               <i class="fa-solid fa-info text-white"></i>
             </div>
-            <span class="text-lg font-bold">Details</span>
+            <span class="font-bold text-lg">Details</span>
           </div>
           <div class="px-4 py-2">
             <div class="font-bold text-lg">{{ property.address }}</div>
@@ -49,74 +49,44 @@
 
         <div class="flex flex-col space-y-4">
           <PropertyDistanceSection
+            v-for="section in sections"
             @on-distance-click="openDirection"
-            label="Transport"
-            :section="property.stations"
-          >
-            <template #icon>
-              <div
-                class="bg-green-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
-              >
-                <i class="fa-solid fa-bus text-white"></i>
-              </div>
-            </template>
-          </PropertyDistanceSection>
-
-          <PropertyDistanceSection
-            @on-distance-click="openDirection"
-            label="Groceries"
-            :section="property.groceries"
-          >
-            <template #icon>
-              <div
-                class="bg-purple-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
-              >
-                <i class="fa-solid fa-cart-shopping text-white"></i>
-              </div>
-            </template>
-          </PropertyDistanceSection>
-
-          <PropertyDistanceSection
-            @on-distance-click="openDirection"
-            label="Schools"
-            :section="property.schools"
-          >
-            <template #icon>
-              <div
-                class="bg-orange-500 flex flex-row items-center justify-center w-8 h-8 rounded-full"
-              >
-                <i class="fa-solid fa-school text-white"></i>
-              </div>
-            </template>
-          </PropertyDistanceSection>
+            :section="section"
+          />
         </div>
 
         <div
           v-if="$route.meta.isParsing && !property.exists"
-          class="flex flex-row items-center space-x-2"
+          class="flex flex-col items-center space-y-2"
         >
-          <button
-            @click="onBackButtonClick"
-            class="bg-gray-600 text-white p-4 rounded-md shadow text-lg uppercase font-bold"
-          >
-            Cancel
+          <button @click="addProperty" class="primary">
+            <i class="fa-solid fa-heart-circle-plus"></i>
+            <span class="grow">Add to your list</span>
           </button>
 
-          <button
-            @click="addProperty"
-            class="bg-green-800 border p-4 rounded-md shadow text-lg grow font-bold text-white uppercase"
-          >
-            Add to list
+          <button @click="onBackButtonClick" class="secondary">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+            <span class="grow">Cancel</span>
           </button>
         </div>
 
-        <button
-          v-else
-          @click="deleteProperty"
-          class="bg-red-700 text-white w-full p-4 rounded-md shadow text-lg uppercase font-bold"
-        >
-          Remove from list
-        </button>
+        <div v-else class="flex flex-col space-y-2">
+          <button @click="openSource" class="primary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span class="grow"> See on {{ property.channel }}</span>
+          </button>
+          <button
+            @click="
+              $ons.notification
+                .confirm('This will remove this property from your list')
+                .then(deleteProperty)
+            "
+            class="secondary"
+          >
+            <i class="fa-solid fa-heart-circle-minus"></i>
+            <span class="grow">Remove from the list</span>
+          </button>
+        </div>
       </div>
     </template>
   </v-ons-page>
@@ -126,7 +96,7 @@
 import { useRoute, useRouter } from "vue-router";
 import usePropertyStore from "../store/properties";
 import { storeToRefs } from "pinia";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import PropertyDistanceSection from "../components/PropertyDistanceSection.vue";
 import axios from "axios";
 
@@ -138,6 +108,24 @@ const { data: properties } = storeToRefs(propertyStore);
 
 const property = ref();
 
+const sections = computed(() => [
+  {
+    label: "Transports",
+    icon: "bus",
+    details: property.value.stations,
+  },
+  {
+    label: "Groceries",
+    icon: "cart-shopping",
+    details: property.value.groceries,
+  },
+  {
+    label: "Schools",
+    icon: "school",
+    details: property.value.schools,
+  },
+]);
+
 onMounted(async () => {
   let item;
 
@@ -147,7 +135,7 @@ onMounted(async () => {
     const text = route.query.text;
     const match = text.match(urlRegex);
     if (match) {
-      const url = match[0]; // Output: https://property-search.flaviotulino.com/parse?id=123
+      const url = match[0];
       const response = await axios.post(
         "https://property-search.flaviotulino.com/api/properties/parse",
         {
@@ -195,7 +183,9 @@ function onBackButtonClick() {
   });
 }
 
-function deleteProperty() {
+function deleteProperty(choice) {
+  if (choice === 0) return false;
+
   axios
     .delete(
       `https://property-search.flaviotulino.com/api/properties/${property.value.id}`,
@@ -227,16 +217,20 @@ function addProperty() {
       });
     });
 }
+
+function openSource() {
+  window.open(property.value.url, "_blank", "noopener,noreferrer");
+}
 </script>
 
 <style scoped>
 @reference "tailwindcss";
 
-section {
-  @apply px-4 py-2;
+button.primary {
+  @apply flex flex-row items-center space-x-2 justify-evenly bg-black border p-3 rounded-md shadow grow font-bold text-white uppercase w-full;
 }
 
-section:not(:last-child) {
-  @apply border-b border-gray-200 border-2;
+button.secondary {
+  @apply flex flex-row items-center space-x-2 justify-evenly border text-black p-3 rounded-md shadow uppercase font-bold w-full;
 }
 </style>

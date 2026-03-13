@@ -4,7 +4,7 @@
     <v-ons-tabbar
       swipeable
       position="top"
-      :active-index="activeIndex"
+      v-model:active-index="activeIndex"
       v-if="activeIndex !== undefined"
     >
       <template v-slot:pages>
@@ -22,7 +22,11 @@
         </v-ons-page>
       </template>
 
-      <v-ons-tab v-for="locality in localities" :label="locality"></v-ons-tab>
+      <v-ons-tab
+        v-for="(locality, index) in localities"
+        :label="locality"
+        :ref="(el) => (tabRefs[index] = el)"
+      ></v-ons-tab>
     </v-ons-tabbar>
   </v-ons-page>
 </template>
@@ -30,10 +34,11 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import usePropertyStore from "../store/properties";
-import { computed, onMounted, onUpdated, ref } from "vue";
+import { computed, nextTick, onMounted, onUpdated, ref } from "vue";
 import { useRouter } from "vue-router";
 import PropertyCard from "../components/PropertyCard.vue";
 import ToolBar from "../components/ToolBar.vue";
+import { watch } from "vue";
 
 const router = useRouter();
 
@@ -65,8 +70,52 @@ onMounted(() => {
       name: "property.list",
       query: null,
     });
+
+    setTimeout(() => {
+      tabRefs.value[activeIndex.value]?.$el.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }, 100);
   } else {
     activeIndex.value = 0;
   }
 });
+
+const tabRefs = ref([]);
+
+watch(activeIndex, async (i) => {
+  await nextTick();
+
+  tabRefs.value[i]?.$el.scrollIntoView({
+    behavior: "smooth",
+    inline: "center",
+    block: "nearest",
+  });
+});
 </script>
+
+<style scoped>
+/* Container of the tabs */
+@reference "tailwindcss";
+:deep(.tabbar) {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Chrome / Safari / Edge */
+:deep(.tabbar::-webkit-scrollbar) {
+  display: none;
+}
+
+/* each tab keeps its natural width */
+:deep(.tabbar .tabbar__item) {
+  flex: 0 0 auto;
+  min-width: 120px; /* adjust */
+}
+</style>

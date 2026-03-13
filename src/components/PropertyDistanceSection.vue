@@ -1,18 +1,25 @@
 <template>
   <div class="bg-white rounded-md">
     <div class="flex flex-col">
-      <div class="text-lg font-bold border-b border-gray-200 px-4 py-2">
+      <div class="font-bold border-b border-gray-200 px-4 py-2">
         <div class="flex flex-row items-center space-x-2">
-          <slot name="icon" />
-          <span>{{ label }}</span>
+          <div
+            class="bg-black flex flex-row items-center justify-center w-8 h-8 rounded-full"
+          >
+            <i
+              class="fa-solid text-white text-sm"
+              :class="`fa-${section.icon}`"
+            ></i>
+          </div>
+          <span class="text-lg">{{ section.label }}</span>
         </div>
       </div>
 
       <div
         class="flex flex-col p-4 border-b border-gray-200 last:border-0"
-        v-for="item in section"
+        v-for="item in section.details"
       >
-        <div class="text-lg">{{ item.displayName }}</div>
+        <div class="">{{ item.displayName }}</div>
 
         <div class="flex flex-row items-center mt-1">
           <button
@@ -41,6 +48,6 @@
 </template>
 
 <script setup>
-defineProps(["label", "section", "icon"]);
+defineProps(["section"]);
 defineEmits(["onDistanceClick"]);
 </script>
