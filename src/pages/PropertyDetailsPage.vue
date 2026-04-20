@@ -4,7 +4,7 @@
       <div class="left">
         <v-ons-toolbar-button
           @click="onBackButtonClick"
-          icon="ion-ios-menu, material: md-arrow-back"
+          icon="ion-ios-arrow-back, material: md-arrow-back"
         ></v-ons-toolbar-button>
       </div>
 

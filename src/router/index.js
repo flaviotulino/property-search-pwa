@@ -8,6 +8,16 @@ const routes = [
     {
         path: '/',
         component: RouterView,
+        async beforeEnter(to, from) {
+            const propertyStore = usePropertyStore();
+
+            const response = await axios
+                .get("https://property-search-api.flaviotulino.com/properties")
+
+
+            propertyStore.setProperties(response.data.properties);
+            return true;
+        },
         children: [
             {
                 path: '',

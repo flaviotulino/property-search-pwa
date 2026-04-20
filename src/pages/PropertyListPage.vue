@@ -30,6 +30,13 @@
         ></v-ons-tab>
       </template>
     </v-ons-tabbar>
+
+    <template v-if="propertyStore.data?.length === 0">
+      <ToolBar />
+      <div class="flex flex-col items-center justify-center h-full space-y-4">
+        <div class="text-gray-500">No properties found.</div>
+      </div>
+    </template>
   </v-ons-page>
 </template>
 
