@@ -16,7 +16,7 @@ onMounted(() => {
     .get("https://property-search-api.flaviotulino.com/properties")
     .then((response) => {
       setTimeout(() => {
-        //propertyStore.setProperties(response.data.properties);
+        propertyStore.setProperties(response.data.properties);
       }, 500);
     });
 });
