@@ -8,27 +8,6 @@ const routes = [
     {
         path: '/',
         component: RouterView,
-        beforeEnter: [
-            // (to, from, next) => {
-            //     if (window.location.pathname === '/parse') {
-            //         window.location.href = '/#/parse';
-            //     } else {
-            //         next();
-            //     }
-            // },
-            (to, from, next) => {
-                const propertyStore = usePropertyStore();
-
-                if (propertyStore.data) {
-                    return true;
-                }
-
-                axios.get('https://property-search.flaviotulino.com/api/properties').then(response => {
-                    propertyStore.setProperties(response.data.properties);
-                    return next()
-                })
-            }
-        ],
         children: [
             {
                 path: '',

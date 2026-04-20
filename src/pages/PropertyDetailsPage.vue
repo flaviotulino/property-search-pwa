@@ -137,7 +137,7 @@ onMounted(async () => {
     if (match) {
       const url = match[0];
       const response = await axios.post(
-        "https://property-search.flaviotulino.com/api/properties/parse",
+        "https://property-search-api.flaviotulino.com/properties/parse",
         {
           url,
         },
@@ -188,7 +188,7 @@ function deleteProperty(choice) {
 
   axios
     .delete(
-      `https://property-search.flaviotulino.com/api/properties/${property.value.id}`,
+      `https://property-search-api.flaviotulino.com/properties/${property.value.id}`,
     )
     .then(() => {
       propertyStore.deleteProperty(property.value.id);
@@ -204,7 +204,7 @@ function deleteProperty(choice) {
 function addProperty() {
   axios
     .post(
-      "https://property-search.flaviotulino.com/api/properties",
+      "https://property-search-api.flaviotulino.com/properties",
       property.value,
     )
     .then(() => {

@@ -5,7 +5,7 @@
       swipeable
       position="top"
       v-model:active-index="activeIndex"
-      v-if="activeIndex !== undefined"
+      v-if="activeIndex !== undefined && localities.length > 0"
     >
       <template v-slot:pages>
         <v-ons-page v-for="locality in localities" :key="locality">
@@ -22,11 +22,13 @@
         </v-ons-page>
       </template>
 
-      <v-ons-tab
-        v-for="(locality, index) in localities"
-        :label="locality"
-        :ref="(el) => (tabRefs[index] = el)"
-      ></v-ons-tab>
+      <template v-if="localities.length > 0">
+        <v-ons-tab
+          v-for="(locality, index) in localities"
+          :label="locality"
+          :ref="(el) => (tabRefs[index] = el)"
+        ></v-ons-tab>
+      </template>
     </v-ons-tabbar>
   </v-ons-page>
 </template>
@@ -37,8 +39,8 @@ import usePropertyStore from "../store/properties";
 import { computed, nextTick, onMounted, onUpdated, ref } from "vue";
 import { useRouter } from "vue-router";
 import PropertyCard from "../components/PropertyCard.vue";
-import ToolBar from "../components/ToolBar.vue";
 import { watch } from "vue";
+import ToolBar from "../components/ToolBar.vue";
 
 const router = useRouter();
 
