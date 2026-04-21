@@ -20,17 +20,16 @@
       <div class="p-4 flex flex-col space-y-4">
         <div>
           <div class="flex flex-row items-center space-x-2">
-            <button
-              class="bg-gray-900 p-2 text-white rounded-md font-bold shadow grow"
+            <label
+              for="datepicker"
+              class="bg-gray-900 p-2 text-white rounded-md font-bold shadow grow flex flex-row items-center justify-center"
               @contextmenu="untrackViewingDate"
             >
               <v-ons-ripple></v-ons-ripple>
               <i class="fa-solid fa-eye mr-2"></i>
 
-              <label for="datepicker" class="cursor-pointer">
-                <span v-if="viewingDate">{{ formatDate(viewingDate) }}</span>
-                <span v-else>Track a Viewing</span>
-              </label>
+              <span v-if="viewingDate">{{ formatDate(viewingDate) }}</span>
+              <span v-else>Track a Viewing</span>
 
               <input
                 type="datetime-local"
@@ -41,7 +40,7 @@
                 v-model="viewingDate"
                 @change="updateViewingDate"
               />
-            </button>
+            </label>
 
             <button
               v-if="viewingDate"
