@@ -16,11 +16,19 @@ const usePropertyStore = defineStore('properties', () => {
         data.value.push(property);
     }
 
+    function updateProperty(updatedProperty) {
+        const index = data.value.findIndex(p => p.id === updatedProperty.id);
+        if (index !== -1) {
+            data.value[index] = updatedProperty;
+        }
+    }
+
     return {
         data,
         setProperties,
         deleteProperty,
-        addProperty
+        addProperty,
+        updateProperty
     }
 })
 

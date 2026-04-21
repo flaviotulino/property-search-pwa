@@ -18,6 +18,46 @@
       />
 
       <div class="p-4 flex flex-col space-y-4">
+        <div>
+          <div class="flex flex-row items-center space-x-2 justify-between">
+            <button
+              class="bg-gray-900 py-2 px-4 text-white rounded-md font-bold shadow"
+              @contextmenu="untrackViewingDate"
+            >
+              <v-ons-ripple></v-ons-ripple>
+              <i class="fa-solid fa-eye mr-2"></i>
+
+              <label for="datepicker" class="cursor-pointer">
+                <span v-if="viewingDate">{{ formatDate(viewingDate) }}</span>
+                <span v-else>Track a Viewing</span>
+              </label>
+
+              <input
+                type="datetime-local"
+                id="datepicker"
+                class="w-0"
+                name="viewingDate"
+                step="900"
+                v-model="viewingDate"
+                @change="updateViewingDate"
+              />
+            </button>
+
+            <button
+              v-if="viewingDate"
+              @click="addToCalendar"
+              class="rounded-md py-2 px-4 bg-white shadow font-bold flex flex-row items-center space-x-2"
+            >
+              <i class="fa-solid fa-calendar mr-2"></i>
+              <span>Add to calendar</span>
+            </button>
+          </div>
+
+          <div v-if="viewingDate" class="mt-1 text-gray-500 text-sm">
+            Long press the button to untrack the viewing
+          </div>
+        </div>
+
         <div class="space-y-1 flex flex-col bg-white rounded-md">
           <div
             class="border-b border-gray-200 flex flex-row items-center px-4 py-2 space-x-2"
@@ -106,6 +146,8 @@ const propertyStore = usePropertyStore();
 
 const { data: properties } = storeToRefs(propertyStore);
 
+const viewingDate = ref();
+
 const property = ref();
 
 const sections = computed(() => [
@@ -159,6 +201,8 @@ onMounted(async () => {
     groceries: item.groceries.sort(sortByDuration),
     stations: item.stations.sort(sortByDuration),
   };
+
+  viewingDate.value = item.viewingDate || undefined;
 });
 
 function openDirection(target, travelMode) {
@@ -220,6 +264,73 @@ function addProperty() {
 
 function openSource() {
   window.open(property.value.url, "_blank", "noopener,noreferrer");
+}
+
+function formatDate(date) {
+  const options = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+
+  return new Date(date)
+    .toLocaleDateString(undefined, options)
+    .replace(",", " @");
+}
+
+function updateViewingDate(event) {
+  if (event !== viewingDate.value) {
+    axios.put(
+      `https://property-search-api.flaviotulino.com/properties/${property.value.id}`,
+      {
+        viewingDate: viewingDate.value,
+      },
+    );
+
+    propertyStore.updateProperty({
+      ...property.value,
+      viewingDate: viewingDate.value,
+    });
+  }
+}
+
+function untrackViewingDate() {
+  viewingDate.value = null;
+  axios.put(
+    `https://property-search-api.flaviotulino.com/properties/${property.value.id}`,
+    {
+      viewingDate: null,
+    },
+  );
+  propertyStore.updateProperty({
+    ...property.value,
+    viewingDate: viewingDate.value,
+  });
+}
+
+function addToCalendar() {
+  const startDate = new Date(viewingDate.value);
+  const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
+
+  const baseUrl = new URL(
+    "https://www.google.com/calendar/render?action=TEMPLATE",
+  );
+  baseUrl.searchParams.set("text", `Viewing: ${property.value.address}`);
+  baseUrl.searchParams.set(
+    "details",
+    `Viewing for the property at ${property.value.address}.\n\n${property.value.url}`,
+  );
+  baseUrl.searchParams.set(
+    "dates",
+    `${startDate.toISOString()}/${endDate.toISOString()}`,
+  );
+  baseUrl.searchParams.set("location", property.value.address);
+
+  const url = baseUrl.toString();
+
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 </script>
 

@@ -11,7 +11,7 @@
         <v-ons-page v-for="locality in localities" :key="locality">
           <div
             @click="seePropertyDetails(property)"
-            class="p-4"
+            class="px-4 py-2"
             v-for="property in properties.filter(
               (p) => p.locality === locality,
             )"
