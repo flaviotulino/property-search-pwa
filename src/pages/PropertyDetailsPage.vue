@@ -21,7 +21,7 @@
         <div>
           <div class="flex flex-row items-center space-x-2 justify-between">
             <button
-              class="bg-gray-900 py-2 px-4 text-white rounded-md font-bold shadow"
+              class="bg-gray-900 p-2 text-white rounded-md font-bold shadow"
               @contextmenu="untrackViewingDate"
             >
               <v-ons-ripple></v-ons-ripple>
@@ -46,7 +46,7 @@
             <button
               v-if="viewingDate"
               @click="addToCalendar"
-              class="rounded-md py-2 px-4 bg-white shadow font-bold flex flex-row items-center space-x-2"
+              class="rounded-md p-2 bg-white shadow font-bold flex flex-row items-center space-x-2"
             >
               <i class="fa-solid fa-calendar mr-2"></i>
               <span>Add to calendar</span>
