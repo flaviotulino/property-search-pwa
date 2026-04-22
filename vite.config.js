@@ -33,7 +33,8 @@ export default defineConfig({
             "text": "text",
             "url": "url"
           }
-        }
+        },
+
       },
 
       workbox: {

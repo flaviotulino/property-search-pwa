@@ -35,19 +35,11 @@
 </template>
 
 <script setup>
+import dayjs from "dayjs";
+
 defineProps(["property"]);
 
 function formatDate(date) {
-  const options = {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  };
-
-  return new Date(date)
-    .toLocaleDateString(undefined, options)
-    .replace(",", " @");
+  return dayjs(date).format("DD/MM/YYYY [at] HH:mm");
 }
 </script>

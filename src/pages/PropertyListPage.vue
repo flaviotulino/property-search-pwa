@@ -11,10 +11,10 @@
         <v-ons-page v-for="locality in localities" :key="locality">
           <div
             @click="seePropertyDetails(property)"
-            class="px-4 py-2"
             v-for="property in properties.filter(
               (p) => p.locality === locality,
             )"
+            class="px-4 py-2 first:pt-4 last:pb-4"
             :key="property.id"
           >
             <PropertyCard :property="property" />

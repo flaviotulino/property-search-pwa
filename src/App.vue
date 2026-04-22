@@ -1,14 +1,8 @@
-<script setup>
-import { onMounted } from "vue";
-// import PWABadge from "./components/PWABadge.vue";
-import usePropertyStore from "./store/properties";
-import axios from "axios";
-import ToolBar from "./components/ToolBar.vue";
-</script>
+<script setup></script>
 
 <template>
   <v-ons-page>
-    <RouterView />
+    <RouterView :key="$route.fullPath" />
   </v-ons-page>
 </template>
 

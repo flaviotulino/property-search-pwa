@@ -28,7 +28,9 @@
               <v-ons-ripple></v-ons-ripple>
               <i class="fa-solid fa-eye mr-2"></i>
 
-              <span v-if="viewingDate">{{ formatDate(viewingDate) }}</span>
+              <span v-if="viewingDate">{{
+                dayjs(viewingDate).format("DD/MM/YYYY [at] HH:mm")
+              }}</span>
               <span v-else>Track a Viewing</span>
 
               <input
@@ -37,7 +39,7 @@
                 class="w-0"
                 name="viewingDate"
                 step="900"
-                v-model="viewingDate"
+                :value="viewingDate"
                 @change="updateViewingDate"
               />
             </label>
@@ -69,7 +71,9 @@
             <span class="font-bold text-lg">Details</span>
           </div>
           <div class="px-4 py-2">
-            <div class="font-bold text-lg">{{ property.address }}</div>
+            <div class="font-bold text-lg" @click="openAddress">
+              {{ property.address }}
+            </div>
             <div class="text-gray-500">{{ property.price }}</div>
 
             <div class="flex flex-row items-center space-x-4 mt-2 -mx-1">
@@ -132,6 +136,7 @@
 </template>
 
 <script setup>
+import dayjs from "dayjs";
 import { useRoute, useRouter } from "vue-router";
 import usePropertyStore from "../store/properties";
 import { storeToRefs } from "pinia";
@@ -201,7 +206,9 @@ onMounted(async () => {
     stations: item.stations.sort(sortByDuration),
   };
 
-  viewingDate.value = item.viewingDate || undefined;
+  viewingDate.value = item.viewingDate
+    ? dayjs(item.viewingDate).format("YYYY-MM-DDTHH:mm")
+    : null;
 });
 
 function openDirection(target, travelMode) {
@@ -235,12 +242,15 @@ function deleteProperty(choice) {
     )
     .then(() => {
       propertyStore.deleteProperty(property.value.id);
-      router.push({
-        name: "property.list",
-        query: {
-          locality: property.value.locality,
-        },
-      });
+
+      setTimeout(() => {
+        router.push({
+          name: "property.list",
+          query: {
+            locality: property.value.locality,
+          },
+        });
+      }, 200);
     });
 }
 
@@ -252,45 +262,45 @@ function addProperty() {
     )
     .then(() => {
       propertyStore.addProperty(property.value);
-      router.push({
-        name: "property.list",
-        query: {
-          locality: property.value.locality,
-        },
-      });
+
+      setTimeout(() => {
+        router.push({
+          name: "property.list",
+          query: {
+            locality: property.value.locality,
+          },
+        });
+      }, 200);
     });
+}
+
+function openAddress() {
+  const baseUrl = new URL("https://www.google.com/maps/search/?api=1");
+  baseUrl.searchParams.set("query", property.value.address);
+  baseUrl.searchParams.set("query_place_id", property.value.placeId);
+
+  const url = baseUrl.toString();
+
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 function openSource() {
   window.open(property.value.url, "_blank", "noopener,noreferrer");
 }
 
-function formatDate(date) {
-  const options = {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  };
-
-  return new Date(date)
-    .toLocaleDateString(undefined, options)
-    .replace(",", " @");
-}
-
 function updateViewingDate(event) {
-  if (event !== viewingDate.value) {
+  const date = new Date(event.target.value).toISOString();
+  if (date !== viewingDate.value) {
     axios.put(
       `https://property-search-api.flaviotulino.com/properties/${property.value.id}`,
       {
-        viewingDate: viewingDate.value,
+        viewingDate: date,
       },
     );
 
     propertyStore.updateProperty({
       ...property.value,
-      viewingDate: viewingDate.value,
+      viewingDate: date,
     });
   }
 }
@@ -305,13 +315,15 @@ function untrackViewingDate() {
   );
   propertyStore.updateProperty({
     ...property.value,
-    viewingDate: viewingDate.value,
+    viewingDate: null,
   });
 }
 
 function addToCalendar() {
-  const startDate = new Date(viewingDate.value);
-  const endDate = new Date(startDate.getTime() + 30 * 60 * 1000);
+  const formatForGoogle = (d) => d.format("YYYYMMDDTHHmmss");
+
+  const startDate = dayjs(viewingDate.value);
+  const endDate = startDate.add(30, "minute");
 
   const baseUrl = new URL(
     "https://www.google.com/calendar/render?action=TEMPLATE",
@@ -323,7 +335,7 @@ function addToCalendar() {
   );
   baseUrl.searchParams.set(
     "dates",
-    `${startDate.toISOString()}/${endDate.toISOString()}`,
+    `${formatForGoogle(startDate)}/${formatForGoogle(endDate)}`,
   );
   baseUrl.searchParams.set("location", property.value.address);
 
